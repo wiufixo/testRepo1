@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq_amqp:0.0.1
+    container_name: rabbitmq_amqp
+    hostname: amqp
+    user: "1002"
+    ports:
+      - 22011:5672
+      - 22012:15672
+    volumes:
+      - /appimg/resources/rabbitmq_amqp/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - /applog/rabbitmq_amqp/:/var/log/rabbitmq/
+      - /appdat/rabbitmq_amqp/:/var/lib/rabbitmq/

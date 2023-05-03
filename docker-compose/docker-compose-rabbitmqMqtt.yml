@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq_mqtt:1.0.0
+    container_name: rabbitmq_mqtt
+    hostname: mqtt1
+    user: "1002"
+    ports:
+      - 22001:1883
+      - 22002:15672
+      - 4369:4369
+      - 25672:25672
+    volumes:
+      - /appimg/resources/rabbitmq_mqtt/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - /applog/rabbitmq_mqtt/:/var/log/rabbitmq/
+      - /appdat/rabbitmq_mqtt/:/var/lib/rabbitmq/
+    extra_hosts:
+      - "mqtt1:61.109.169.71"
+      - "mqtt2:61.109.169.72"
