@@ -10,7 +10,7 @@ services:
       - 9901:9901
     volumes:
       - /appimg/resources/envoy/envoy.yaml:/etc/envoy/envoy.yaml
-      - /applog/envoy/:/var/log/
+      - /applog/envoy/:/tmp/
     networks:
       - dockernet
 

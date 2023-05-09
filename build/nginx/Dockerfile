@@ -1,6 +1,7 @@
 FROM nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
+RUN apt-get update && apt-get install -y vim
 
 # COPY /appimg/test/envoyKeycloak/nginx/default.conf /etc/nginx/conf.d/default.conf
 # COPY /appimg/test/envoyKeycloak/nginx/nginx.conf /etc/nginx/nginx.conf
