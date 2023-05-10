@@ -32,17 +32,21 @@ static_resources:
                         - "*"
                       routes: # routes 와 matcher 중 하나만 설정 가능
                         - match:
-                            prefix: "/testweb"
+                            prefix: "/hysweb"
                           route:
-                            cluster: testweb
+                            cluster: hysweb
                         - match:
-                            prefix: "/testapi"
+                            prefix: "/hysapi"
                           route:
-                            cluster: testapi
+                            cluster: hysapi
                         - match:
-                            prefix: "/testadm"
+                            prefix: "/hysadm"
                           route:
-                            cluster: testadm
+                            cluster: hysadm
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: hysweb
 
                 http_filters:
                   # https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/jwt_authn_filter
@@ -89,42 +93,55 @@ static_resources:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
   clusters:
-    - name: testweb
+    - name: hysweb
       connect_timeout: 1s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: testweb
+        cluster_name: hysweb
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: 61.109.169.71
-                      port_value: 31001
-    - name: testapi
+                      address: 10.18.5.10
+                      port_value: 31011
+    - name: hysapi
       connect_timeout: 1s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: testapi
+        cluster_name: hysapi
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: 61.109.169.71
-                      port_value: 31002
-    - name: testadm
+                      address: 10.18.5.10
+                      port_value: 31012
+    - name: hysadm
       connect_timeout: 1s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: testadm
+        cluster_name: hysadm
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: 61.109.169.71
-                      port_value: 31003
+                      address: 10.18.5.10
+                      port_value: 31013
+    - name: eformadm
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: eformadm
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 10.18.5.10
+                      port_value: 9303

@@ -8,12 +8,13 @@ services:
     container_name: envoy
     ports:
       - 21001:21001
-      - 9901:9901
+      - 21002:9901
     volumes:
       - /appimg/resources/envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - /applog/envoy/:/tmp/
     environment:
       - TZ=Asia/Seoul
+      - env_ip=61.109.169.71
     networks:
       - dockernet
 
@@ -23,9 +24,9 @@ services:
     image: nginx:1.0.0
     container_name: nginx
     ports:
-      - 31001:31001
+      - 31011:31011
     volumes:
-      - /apprun/testweb/:/apprun/testweb/
+      - /apprun/hysweb/:/apprun/hysweb/
       - /appimg/resources/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - /appimg/resources/nginx/nginx.conf:/etc/nginx/nginx.conf
       - /applog/nginx/:/var/log/nginx/
