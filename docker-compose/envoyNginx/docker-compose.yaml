@@ -24,6 +24,8 @@ services:
     image: nginx:1.0.0
     container_name: nginx
     ports:
+      - 80:80
+      - 31010:31010
       - 31011:31011
     volumes:
       - /apprun/:/apprun/
