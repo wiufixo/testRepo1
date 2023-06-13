@@ -7,7 +7,8 @@
   - &hysweb_address { address: 10.18.5.10, port_value: 31011 }
   - &hysapi_address { address: 10.18.5.10, port_value: 31012 }
   - &hysadm_address { address: 10.18.5.10, port_value: 31013 }
-  - &gitea_address { address: 10.18.5.10, port_value: 31000 }
+  - &gitea_address { address: 10.18.5.10, port_value: 9980 }
+  - &jenkins_address { address: 10.18.5.10, port_value: 9999 }
 
 admin:
   access_log_path: /applog/admin_access.log
@@ -37,6 +38,8 @@ static_resources:
                       domains:
                         - "*"
                       routes: # routes 와 matcher 중 하나만 설정 가능
+                        - match: { prefix: "/hysadm" } # 운영에서 삭제 필요
+                          route: { cluster: hysadm } # 운영에서 삭제 필요
                         - match: { prefix: "/hysweb" }
                           route: { cluster: hysweb }
                         - match: { prefix: "/hysapi" }
@@ -47,6 +50,8 @@ static_resources:
                           route: { cluster: eformadm }
                         - match: { prefix: "/gitea" }
                           route: { cluster: gitea }
+                        - match: { prefix: "/jenkins" }
+                          route: { cluster: jenkins }
                         - match: { prefix: "/" }
                           route: { cluster: hysweb }
                 http_filters:
@@ -75,35 +80,35 @@ static_resources:
                                       - header:
                                           key: "original_status"
                                           value: "401"
-                  - name: envoy.filters.http.jwt_authn
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
-                      providers:
-                        jwt_checker:
-                          from_headers:
-                            - name: Access-Token
-                          issuer: inzisoft
-                          forward: true
-                          payload_in_metadata: auth_payload
-                          local_jwks:
-                            inline_string: '{
-                              "keys": [
-                              {
-                              "kty" : "oct",
-                              "alg" : "HS256",
-                              "k"   : "aWJrc0Bpbnppc29mdC5jb20="
-                              }
-                              ]
-                              }'
-                      rules:
-                        - match: { prefix: /hysweb }
-                        - match: { path: /hysapi }
-                        - match: { path: /hysapi/ }
-                        - match: { prefix: /hysapi/login }
-                        - match: { prefix: /hysapi/v3/api-docs }
-                        - match: { prefix: /hysapi/swagger-ui }
-                        - match: { prefix: /hysapi/ }
-                          requires: { provider_name: jwt_checker }
+                  # - name: envoy.filters.http.jwt_authn
+                  #   typed_config:
+                  #     "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                  #     providers:
+                  #       jwt_checker:
+                  #         from_headers:
+                  #           - name: Access-Token
+                  #         issuer: inzisoft
+                  #         forward: true
+                  #         payload_in_metadata: auth_payload
+                  #         local_jwks:
+                  #           inline_string: '{
+                  #             "keys": [
+                  #             {
+                  #             "kty" : "oct",
+                  #             "alg" : "HS256",
+                  #             "k"   : "aWJrc0Bpbnppc29mdC5jb20="
+                  #             }
+                  #             ]
+                  #             }'
+                  #     rules:
+                  #       - match: { prefix: /hysweb }
+                  #       - match: { path: /hysapi }
+                  #       - match: { path: /hysapi/ }
+                  #       - match: { prefix: /hysapi/login }
+                  #       - match: { prefix: /hysapi/v3/api-docs }
+                  #       - match: { prefix: /hysapi/swagger-ui }
+                  #       - match: { prefix: /hysapi/ }
+                  #         requires: { provider_name: jwt_checker }
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
@@ -134,6 +139,8 @@ static_resources:
                           route: { cluster: error }
                         - match: { prefix: "/gitea" }
                           route: { cluster: gitea }
+                        - match: { prefix: "/jenkins" }
+                          route: { cluster: jenkins }
                         - match: { prefix: "/" }
                           route: { cluster: hysweb }
                 http_filters:
@@ -248,6 +255,17 @@ static_resources:
               - endpoint:
                   address:
                     socket_address: *gitea_address
+    - name: jenkins
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: jenkins
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: *jenkins_address
 # single_predicate:
 #   input:
 #     name: 4xx_response

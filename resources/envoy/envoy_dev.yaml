@@ -2,12 +2,13 @@
   - &admin_address { address: 0.0.0.0, port_value: 9901 }
   - &vpn_listener_address { address: 0.0.0.0, port_value: 21001 }
   - &web_listener_address { address: 0.0.0.0, port_value: 21002 }
+  - &eformadm_address { address: 61.109.169.71, port_value: 9303 }
   - &error_address { address: 61.109.169.71, port_value: 31010 }
   - &hysweb_address { address: 61.109.169.71, port_value: 31011 }
   - &hysapi_address { address: 61.109.169.71, port_value: 31012 }
   - &hysadm_address { address: 61.109.169.71, port_value: 31013 }
-  - &eformadm_address { address: 61.109.169.71, port_value: 9303 }
-  - &gitea_address { address: 61.109.169.71, port_value: 31000 }
+  - &gitea_address { address: 61.109.169.71, port_value: 9980 }
+  - &jenkins_address { address: 61.109.169.71, port_value: 9090 }
 
 admin:
   access_log_path: /applog/admin_access.log
@@ -37,6 +38,8 @@ static_resources:
                       domains:
                         - "*"
                       routes: # routes 와 matcher 중 하나만 설정 가능
+                        - match: { prefix: "/hysadm" } # 운영에서 삭제 필요
+                          route: { cluster: hysadm } # 운영에서 삭제 필요
                         - match: { prefix: "/hysweb" }
                           route: { cluster: hysweb }
                         - match: { prefix: "/hysapi" }
@@ -47,10 +50,8 @@ static_resources:
                           route: { cluster: eformadm }
                         - match: { prefix: "/gitea" }
                           route: { cluster: gitea }
-                        - match: { prefix: "/assets" }
-                          route: { cluster: gitea }
-                        - match: { prefix: "/avatar" }
-                          route: { cluster: gitea }
+                        - match: { prefix: "/jenkins" }
+                          route: { cluster: jenkins }
                         - match: { prefix: "/" }
                           route: { cluster: hysweb }
                 http_filters:
@@ -138,6 +139,8 @@ static_resources:
                           route: { cluster: error }
                         - match: { prefix: "/gitea" }
                           route: { cluster: gitea }
+                        - match: { prefix: "/jenkins" }
+                          route: { cluster: jenkins }
                         - match: { prefix: "/" }
                           route: { cluster: hysweb }
                 http_filters:
@@ -252,6 +255,17 @@ static_resources:
               - endpoint:
                   address:
                     socket_address: *gitea_address
+    - name: jenkins
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: jenkins
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: *jenkins_address
 # single_predicate:
 #   input:
 #     name: 4xx_response
