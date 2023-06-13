@@ -1,0 +1,17 @@
+version: "3"
+services:
+  jenkins:
+    build:
+      context: /appimg/build/jenkins_docker
+    # image: jenkins_docker:1.0.0
+    container_name: jenkins
+    user: "1002"
+    privileged: true
+    ports:
+      - 9090:8080
+      - 50000:50000
+    volumes:
+      - /appdat/jenkins_docker:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Asia/Seoul

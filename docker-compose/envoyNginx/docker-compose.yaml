@@ -27,6 +27,7 @@ services:
       - 80:80
       - 31010:31010
       - 31011:31011
+      - 31000:31000
     volumes:
       - /apprun/:/apprun/
       - /appimg/resources/nginx/default.conf:/etc/nginx/conf.d/default.conf

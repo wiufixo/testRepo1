@@ -7,6 +7,7 @@
   - &hysweb_address { address: 10.18.5.10, port_value: 31011 }
   - &hysapi_address { address: 10.18.5.10, port_value: 31012 }
   - &hysadm_address { address: 10.18.5.10, port_value: 31013 }
+  - &gitea_address { address: 10.18.5.10, port_value: 31000 }
 
 admin:
   access_log_path: /applog/admin_access.log
@@ -44,6 +45,8 @@ static_resources:
                           route: { cluster: error }
                         - match: { prefix: "/eformadm" }
                           route: { cluster: eformadm }
+                        - match: { prefix: "/gitea" }
+                          route: { cluster: gitea }
                         - match: { prefix: "/" }
                           route: { cluster: hysweb }
                 http_filters:
@@ -67,7 +70,7 @@ static_resources:
                                   typed_config:
                                     "@type": type.googleapis.com/envoy.extensions.http.custom_response.redirect_policy.v3.RedirectPolicy
                                     status_code: 200
-                                    uri: "http://tfin.qsvc.co.kr/error/4xx"
+                                    uri: "http://tfin.qsvc.co.kr/error/4xx/"
                                     response_headers_to_add:
                                       - header:
                                           key: "original_status"
@@ -129,6 +132,8 @@ static_resources:
                           route: { cluster: hysadm }
                         - match: { prefix: "/error" }
                           route: { cluster: error }
+                        - match: { prefix: "/gitea" }
+                          route: { cluster: gitea }
                         - match: { prefix: "/" }
                           route: { cluster: hysweb }
                 http_filters:
@@ -168,7 +173,7 @@ static_resources:
                                   typed_config:
                                     "@type": type.googleapis.com/envoy.extensions.http.custom_response.redirect_policy.v3.RedirectPolicy
                                     status_code: 200
-                                    uri: "http://tfin.qsvc.co.kr/error/5xx"
+                                    uri: "http://tfin.qsvc.co.kr/error/5xx/"
                                     response_headers_to_add:
                                       - header:
                                           key: "original_status"
@@ -232,6 +237,17 @@ static_resources:
               - endpoint:
                   address:
                     socket_address: *eformadm_address
+    - name: gitea
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: gitea
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: *gitea_address
 # single_predicate:
 #   input:
 #     name: 4xx_response
