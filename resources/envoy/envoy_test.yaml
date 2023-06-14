@@ -132,7 +132,9 @@ static_resources:
                     - name: default
                       domains:
                         - "*"
-                      routes: # routes 와 matcher 중 하나만 설정 가능
+                      routes: # routes 와 matcher 중 하나만 설정                         - match: { prefix: "/hysapi" }
+                        - match: { prefix: "/hysapi" }
+                          route: { cluster: hysapi }
                         - match: { prefix: "/hysadm" }
                           route: { cluster: hysadm }
                         - match: { prefix: "/error" }
